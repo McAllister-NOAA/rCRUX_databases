@@ -2,7 +2,7 @@
 const $=id=>document.getElementById(id), search=$("globalSearch");
 const DEFAULTS=["assay_name","available_databases","nt_database_date","doi","pcr_primer_forward","pcr_primer_reverse","targetTaxonomicAssay"];
 const REQUIRED=["assay_name","doi","nt_database_date","date_released"];
-const REPOSITORY_URL="https://github.com/McAllister-NOAA/rCRUX_databases"; $("repoLink").href=REPOSITORY_URL;
+const REPOSITORY_URL="https://github.com/McAllister-NOAA/rCRUX_databases/"; $("repoLink").href=REPOSITORY_URL;
 let allRows=[],summaryRows=[],fields=[],selected=[],table=null,mode="summary",assay=null;
 const clean=v=>String(v??"").trim(), norm=v=>clean(v).toLocaleLowerCase();
 const date=v=>{const n=Date.parse(clean(v));return Number.isNaN(n)?-Infinity:n};
@@ -45,8 +45,24 @@ function build(which,rows){
 }
 function summary(){assay=null;search.value="";$("backButton").hidden=true;$("columnChooser").hidden=false;$("viewTitle").textContent="Available assays";$("viewDescription").textContent="One row per assay_name. The linked record is chosen by latest date_released, then latest nt_database_date; ties are random."; $("tableTip").textContent="Available databases counts every CSV row for that assay_name. Click the count to view all records.";build("summary",summaryRows)}
 function showAssay(a){assay=a;search.value="";$("backButton").hidden=false;$("columnChooser").hidden=true;$("viewTitle").textContent=a;$("viewDescription").textContent="All database records for this assay_name, including records with matching dates.";$("tableTip").textContent="This detail view includes every column from records.csv.";build("detail",allRows.filter(r=>clean(r.assay_name)===a))}
+function parseCSV(text){
+ // Small CSV parser with quoted-field and escaped-quote support; no parser CDN required.
+ const rows=[];let row=[],value="",quoted=false;
+ for(let i=0;i<text.length;i++){
+  const ch=text[i];
+  if(quoted){if(ch==='"'&&text[i+1]==='"'){value+='"';i++}else if(ch==='"'){quoted=false}else value+=ch}
+  else if(ch==='"'&&value==="")quoted=true;
+  else if(ch===','){row.push(value.trim());value=""}
+  else if(ch==='\n'){row.push(value.trim());if(row.some(v=>v!==""))rows.push(row);row=[];value=""}
+  else if(ch!=='\r')value+=ch;
+ }
+ row.push(value.trim());if(row.some(v=>v!==""))rows.push(row);
+ if(!rows.length)return {fields:[],data:[]};
+ const headers=rows.shift().map(v=>v.trim());
+ return {fields:headers,data:rows.map(values=>Object.fromEntries(headers.map((h,i)=>[h,(values[i]??"").trim()] )))};
+}
 fetch("data/records.csv").then(r=>{if(!r.ok)throw Error("Could not load data/records.csv");return r.text()}).then(text=>{
- const parsed=Papa.parse(text,{header:true,skipEmptyLines:"greedy",transformHeader:v=>v.trim(),transform:v=>v.trim()});fields=(parsed.meta.fields||[]).filter(Boolean);
+ const parsed=parseCSV(text);fields=parsed.fields.filter(Boolean);
  const missing=REQUIRED.filter(f=>!fields.includes(f));if(missing.length)throw Error("Missing required CSV columns: "+missing.join(", "));
  allRows=parsed.data.filter(r=>Object.values(r).some(v=>clean(v)));summaryRows=summarize(allRows);
  selected=DEFAULTS.filter(f=>f==="available_databases"||fields.includes(f));options();summary();$("dataStatus").textContent=`${allRows.length} database records loaded`;
@@ -56,6 +72,6 @@ fetch("data/records.csv").then(r=>{if(!r.ok)throw Error("Could not load data/rec
  $("clearFilters").onclick=()=>{search.value="";if(table){table.clearFilter(true);table.clearSort();table.setSort([{column:mode==="summary"?"assay_name":"date_released",dir:mode==="summary"?"asc":"desc"}]);updateCount()}};
  $("downloadCsv").onclick=()=>{if(table)table.download("csv",mode==="summary"?"assay-summary.csv":"assay-database-records.csv")};
  search.addEventListener("input",globalSearch);
-}).catch(err=>{$("dataStatus").textContent="Could not load data";$("table").innerHTML=`<div style="padding:24px;color:#9b2c2c">${esc(err.message)}</div>`;$("resultCount").textContent="0 records";console.error(err)});
+}).catch(err=>{$("dataStatus").textContent="Could not load data";$("columnCheckboxes").innerHTML=`<p class="column-error">Could not load column names: ${esc(err.message)}</p>`;$("table").innerHTML=`<div style="padding:24px;color:#9b2c2c">${esc(err.message)}</div>`;$("resultCount").textContent="0 records";console.error(err)});
 document.addEventListener("keydown",e=>{if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==="k"){e.preventDefault();search.focus()}if(e.key==="Escape"&&document.activeElement===search){search.value="";globalSearch()}});
 })();
