@@ -1,61 +1,12 @@
 <!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Browse assay database releases and their available dates.">
-  <title>Assay Database Catalog</title>
-  <link rel="stylesheet" href="https://unpkg.com/tabulator-tables@6.3.1/dist/css/tabulator.min.css">
-  <link rel="stylesheet" href="assets/style.css">
-</head>
-<body>
-  <header class="site-header">
-    <div class="header-inner">
-      <p class="eyebrow">DATABASE CATALOG</p>
-      <h1>Assay Database Catalog</h1>
-      <p class="subtitle">Explore available nucleotide database releases by assay.</p>
-    </div>
-  </header>
-
-  <main class="page">
-    <section class="intro" aria-label="About this table">
-      <div>
-        <h2 id="viewTitle">Available assays</h2>
-        <p id="viewDescription">Each row represents an assay. Select a release count to inspect all database records for that assay.</p>
-      </div>
-      <a class="repo-link" href="https://github.com/" id="repoLink">View repository <span aria-hidden="true">↗</span></a>
-    </section>
-
-    <section class="table-card" aria-label="Database catalog table">
-      <div class="toolbar">
-        <button id="backButton" class="button button-secondary" type="button" hidden>← All assays</button>
-        <label class="global-search">
-          <span class="sr-only">Search table</span>
-          <span class="search-icon" aria-hidden="true">⌕</span>
-          <input id="globalSearch" type="search" placeholder="Search all columns…" autocomplete="off">
-          <kbd>⌘ / Ctrl K</kbd>
-        </label>
-        <div class="toolbar-actions">
-          <span id="resultCount" class="result-count" aria-live="polite">Loading records…</span>
-          <button id="clearFilters" class="button button-secondary" type="button">Clear filters</button>
-          <button id="downloadCsv" class="button button-primary" type="button">Export CSV ↓</button>
-        </div>
-      </div>
-      <div id="table" aria-label="Assay database records"></div>
-      <div class="table-footer">
-        <span id="tableTip">Select a release count to see the underlying database records.</span>
-        <span id="dataStatus">Loading data…</span>
-      </div>
-    </section>
-
-    <footer class="page-footer">
-      <span>Source data: <code>data/records.csv</code>.</span>
-      <span>Built with <a href="https://tabulator.info/" target="_blank" rel="noreferrer">Tabulator</a>.</span>
-    </footer>
-  </main>
-
-  <script src="https://unpkg.com/papaparse@5.4.1/papaparse.min.js"></script>
-  <script src="https://unpkg.com/tabulator-tables@6.3.1/dist/js/tabulator.min.js"></script>
-  <script src="assets/table.js"></script>
-</body>
-</html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>rCRUX Assay Database Catalog</title><link rel="stylesheet" href="https://unpkg.com/tabulator-tables@6.3.1/dist/css/tabulator.min.css"><link rel="stylesheet" href="assets/style.css"></head>
+<body><header class="site-header"><div class="header-inner"><p class="eyebrow">REFERENCE CATALOG</p><h1>rCRUX Assay Database Catalog</h1><p class="subtitle">Browse assays, compare database releases, and explore metadata.</p></div></header>
+<main class="page"><section class="intro"><div><h2 id="viewTitle">Available assays</h2><p id="viewDescription">One row per assay name. Select a database count to inspect every record for that assay.</p></div><a class="repo-link" id="repoLink" href="https://github.com/">View repository ↗</a></section>
+<section class="table-card"><div class="toolbar"><button id="backButton" class="button secondary" hidden>← All assays</button>
+<label class="global-search"><span class="sr-only">Search all columns</span><span class="search-icon">⌕</span><input id="globalSearch" type="search" placeholder="Search all columns…"><kbd>⌘ / Ctrl K</kbd></label>
+<div class="toolbar-actions"><details id="columnChooser" class="column-chooser"><summary class="button secondary">Choose columns ▾</summary><div class="column-options"><strong>Show on main table</strong><div id="columnCheckboxes"></div><div class="column-options-footer"><button id="resetColumns" class="text-button">Reset defaults</button><button id="doneColumns" class="button primary">Apply</button></div></div></details>
+<span id="resultCount" class="result-count">Loading…</span><button id="clearFilters" class="button secondary">Clear filters</button><button id="downloadCsv" class="button primary">Export CSV ↓</button></div></div>
+<div id="table"></div><div class="table-footer"><span id="tableTip">Available databases counts every record sharing the assay_name.</span><span id="dataStatus">Loading data…</span></div></section>
+<footer class="page-footer"><span>Source data: <code>data/records.csv</code></span><span>Built with <a href="https://tabulator.info/">Tabulator</a></span></footer></main>
+<script src="https://unpkg.com/papaparse@5.4.1/papaparse.min.js"></script><script src="https://unpkg.com/tabulator-tables@6.3.1/dist/js/tabulator.min.js"></script><script src="assets/table.js"></script></body></html>
